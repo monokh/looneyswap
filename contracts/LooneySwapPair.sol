@@ -48,4 +48,16 @@ contract LooneySwapPair is LooneySwapERC20 {
     reserve0 = reserve0After;
     reserve1 = reserve1After;
   }
+
+  function remove(uint liquidity) public {
+    assert(transfer(address(this), liquidity));
+    uint currentSupply = totalSupply();
+    uint amount0 = liquidity.mul(reserve0).div(currentSupply);
+    uint amount1 = liquidity.mul(reserve1).div(currentSupply);
+    _burn(address(this), liquidity);
+    assert(IERC20(token0).transfer(msg.sender, amount0));
+    assert(IERC20(token1).transfer(msg.sender, amount1));
+    reserve0 = reserve0.sub(amount0);
+    reserve1 = reserve1.sub(amount1);
+  }
 }

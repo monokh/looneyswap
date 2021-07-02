@@ -65,4 +65,28 @@ describe("LooneySwapPair", function() {
     expect(await pair.balanceOf(accounts[1].address)).to.equal(100000)
     expect(await pair.balanceOf(accounts[2].address)).to.equal(300000)
   })
+
+  it("Should burn correct amount", async function() {
+    await (await token0.connect(accounts[1]).approve(pair.address, 1)).wait()
+    await (await token1.connect(accounts[1]).approve(pair.address, 50000)).wait()
+    await (await pair.connect(accounts[1]).add(1, 50000)).wait()
+
+    await (await token0.connect(accounts[2]).approve(pair.address, 3)).wait()
+    await (await token1.connect(accounts[2]).approve(pair.address, 150000)).wait()
+    await (await pair.connect(accounts[2]).add(3, 150000)).wait()
+
+    const token0BalanceBefore = await token0.balanceOf(accounts[1].address)
+    const token1BalanceBefore = await token1.balanceOf(accounts[1].address)
+
+    const lpTokens = await pair.balanceOf(accounts[1].address)
+    await (await pair.connect(accounts[1]).remove(lpTokens)).wait()
+
+    expect(await token0.balanceOf(accounts[1].address)).to.equal(token0BalanceBefore.add(1))
+    expect(await token1.balanceOf(accounts[1].address)).to.equal(token1BalanceBefore.add(50000))
+
+    expect(await pair.reserve0()).to.equal(3)
+    expect(await pair.reserve1()).to.equal(150000)
+    expect(await pair.totalSupply()).to.equal(300000)
+    expect(await pair.balanceOf(accounts[1].address)).to.equal(0)
+  })
 })
