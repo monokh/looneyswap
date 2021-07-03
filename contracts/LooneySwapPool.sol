@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "hardhat/console.sol";
 import "./LooneySwapERC20.sol";
 
-contract LooneySwapPair is LooneySwapERC20 {
+contract LooneySwapPool is LooneySwapERC20 {
   uint public constant INITIAL_SUPPLY = 10**5;
 
   address public token0;
