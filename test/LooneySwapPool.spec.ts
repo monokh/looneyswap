@@ -43,26 +43,26 @@ describe("LooneySwapPool", function() {
 
   it("Should add initial liquidity to reserves", async function() {
     await (await eth.connect(accounts[1]).approve(pool.address, 1)).wait()
-    await (await dai.connect(accounts[1]).approve(pool.address, 50000)).wait()
-    await (await pool.connect(accounts[1]).add(1, 50000)).wait()
+    await (await dai.connect(accounts[1]).approve(pool.address, 2000)).wait()
+    await (await pool.connect(accounts[1]).add(1, 2000)).wait()
 
     expect(await pool.reserve0()).to.equal(1)
-    expect(await pool.reserve1()).to.equal(50000)
+    expect(await pool.reserve1()).to.equal(2000)
     expect(await pool.totalSupply()).to.equal(100000) // Initial Supply
     expect(await pool.balanceOf(accounts[1].address)).to.equal(100000)
   })
 
   it("Should mint correct amount", async function() {
     await (await eth.connect(accounts[1]).approve(pool.address, 1)).wait()
-    await (await dai.connect(accounts[1]).approve(pool.address, 50000)).wait()
-    await (await pool.connect(accounts[1]).add(1, 50000)).wait()
+    await (await dai.connect(accounts[1]).approve(pool.address, 2000)).wait()
+    await (await pool.connect(accounts[1]).add(1, 2000)).wait()
 
     await (await eth.connect(accounts[2]).approve(pool.address, 3)).wait()
-    await (await dai.connect(accounts[2]).approve(pool.address, 150000)).wait()
-    await (await pool.connect(accounts[2]).add(3, 150000)).wait()
+    await (await dai.connect(accounts[2]).approve(pool.address, 6000)).wait()
+    await (await pool.connect(accounts[2]).add(3, 6000)).wait()
 
     expect(await pool.reserve0()).to.equal(4)
-    expect(await pool.reserve1()).to.equal(200000)
+    expect(await pool.reserve1()).to.equal(8000)
     expect(await pool.totalSupply()).to.equal(400000)
 
     expect(await pool.balanceOf(accounts[1].address)).to.equal(100000)
@@ -71,12 +71,12 @@ describe("LooneySwapPool", function() {
 
   it("Should burn correct amount", async function() {
     await (await eth.connect(accounts[1]).approve(pool.address, 1)).wait()
-    await (await dai.connect(accounts[1]).approve(pool.address, 50000)).wait()
-    await (await pool.connect(accounts[1]).add(1, 50000)).wait()
+    await (await dai.connect(accounts[1]).approve(pool.address, 2000)).wait()
+    await (await pool.connect(accounts[1]).add(1, 2000)).wait()
 
     await (await eth.connect(accounts[2]).approve(pool.address, 3)).wait()
-    await (await dai.connect(accounts[2]).approve(pool.address, 150000)).wait()
-    await (await pool.connect(accounts[2]).add(3, 150000)).wait()
+    await (await dai.connect(accounts[2]).approve(pool.address, 6000)).wait()
+    await (await pool.connect(accounts[2]).add(3, 6000)).wait()
 
     const ethBalanceBefore = await eth.balanceOf(accounts[1].address)
     const daiBalanceBefore = await dai.balanceOf(accounts[1].address)
@@ -85,44 +85,44 @@ describe("LooneySwapPool", function() {
     await (await pool.connect(accounts[1]).remove(lpTokens)).wait()
 
     expect(await eth.balanceOf(accounts[1].address)).to.equal(ethBalanceBefore.add(1))
-    expect(await dai.balanceOf(accounts[1].address)).to.equal(daiBalanceBefore.add(50000))
+    expect(await dai.balanceOf(accounts[1].address)).to.equal(daiBalanceBefore.add(2000))
 
     expect(await pool.reserve0()).to.equal(3)
-    expect(await pool.reserve1()).to.equal(150000)
+    expect(await pool.reserve1()).to.equal(6000)
     expect(await pool.totalSupply()).to.equal(300000)
     expect(await pool.balanceOf(accounts[1].address)).to.equal(0)
   })
 
   it("Should return correct output amount for dai", async function() {
     await (await eth.connect(accounts[1]).approve(pool.address, 5)).wait()
-    await (await dai.connect(accounts[1]).approve(pool.address, 250000)).wait()
-    await (await pool.connect(accounts[1]).add(5, 250000)).wait()
+    await (await dai.connect(accounts[1]).approve(pool.address, 10000)).wait()
+    await (await pool.connect(accounts[1]).add(5, 10000)).wait()
 
     const [amountOut, reserve0, reserve1] = await pool.getAmountOut(1, eth.address)
-    expect(amountOut).to.equal(41667)
+    expect(amountOut).to.equal(1667)
     expect(reserve0).to.equal(6)
-    expect(reserve1).to.equal(208333)
+    expect(reserve1).to.equal(8333)
   })
 
   it("Should return correct output amount for eth", async function() {
     await (await eth.connect(accounts[1]).approve(pool.address, 20)).wait()
-    await (await dai.connect(accounts[1]).approve(pool.address, 1000000)).wait()
-    await (await pool.connect(accounts[1]).add(20, 1000000)).wait()
+    await (await dai.connect(accounts[1]).approve(pool.address, 40000)).wait()
+    await (await pool.connect(accounts[1]).add(20, 40000)).wait()
 
-    const [amountOut, reserve0, reserve1] = await pool.getAmountOut(120000, dai.address)
+    const [amountOut, reserve0, reserve1] = await pool.getAmountOut(6000, dai.address)
     expect(amountOut).to.equal(3)
     expect(reserve0).to.equal(17)
-    expect(reserve1).to.equal(1120000)
+    expect(reserve1).to.equal(46000)
   })
 
   it("Should swap successfully with exact amountOut", async function() {
     await (await eth.connect(accounts[1]).approve(pool.address, 5)).wait()
-    await (await dai.connect(accounts[1]).approve(pool.address, 250000)).wait()
-    await (await pool.connect(accounts[1]).add(5, 250000)).wait()
+    await (await dai.connect(accounts[1]).approve(pool.address, 10000)).wait()
+    await (await pool.connect(accounts[1]).add(5, 10000)).wait()
 
     await (await eth.connect(accounts[2]).approve(pool.address, 20)).wait()
-    await (await dai.connect(accounts[2]).approve(pool.address, 1000000)).wait()
-    await (await pool.connect(accounts[2]).add(20, 1000000)).wait()
+    await (await dai.connect(accounts[2]).approve(pool.address, 40000)).wait()
+    await (await pool.connect(accounts[2]).add(20, 40000)).wait()
 
     const ethBalanceBefore = await eth.balanceOf(accounts[3].address)
     const daiBalanceBefore = await dai.balanceOf(accounts[3].address)
@@ -132,13 +132,13 @@ describe("LooneySwapPool", function() {
     await (await pool.connect(accounts[3]).swap(1, amountOut, eth.address, dai.address, accounts[3].address))
 
     expect(await eth.balanceOf(accounts[3].address)).to.equal(ethBalanceBefore.sub(1))
-    expect(await dai.balanceOf(accounts[3].address)).to.equal(daiBalanceBefore.add(48077))
+    expect(await dai.balanceOf(accounts[3].address)).to.equal(daiBalanceBefore.add(1924))
   })
 
   it("Should prevent slip when output slides", async function() {
     await (await eth.connect(accounts[1]).approve(pool.address, 20)).wait()
-    await (await dai.connect(accounts[1]).approve(pool.address, 1000000)).wait()
-    await (await pool.connect(accounts[1]).add(20, 1000000)).wait()
+    await (await dai.connect(accounts[1]).approve(pool.address, 40000)).wait()
+    await (await pool.connect(accounts[1]).add(20, 40000)).wait()
 
     const [amountOut] = await pool.getAmountOut(1, eth.address)
     await (await eth.connect(accounts[2]).approve(pool.address, amountOut)).wait
