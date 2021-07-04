@@ -1,14 +1,11 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "hardhat/console.sol";
-import "./LooneySwapERC20.sol";
 
-contract LooneySwapPool is LooneySwapERC20 {
-  uint public constant INITIAL_SUPPLY = 10**5;
-
+contract LooneySwapPool is ERC20 {
   address public token0;
   address public token1;
 
@@ -18,7 +15,9 @@ contract LooneySwapPool is LooneySwapERC20 {
   // Reserve of token 1
   uint public reserve1;
 
-  constructor(address _token0, address _token1) LooneySwapERC20() {
+  uint public constant INITIAL_SUPPLY = 10**5;
+
+  constructor(address _token0, address _token1) ERC20("LooneyLiquidityProvider", "LP") {
     token0 = _token0;
     token1 = _token1;
   }
@@ -64,9 +63,9 @@ contract LooneySwapPool is LooneySwapERC20 {
     uint amount1 = liquidity * reserve1 / currentSupply;
 
     _burn(address(this), liquidity);
+
     assert(IERC20(token0).transfer(msg.sender, amount0));
     assert(IERC20(token1).transfer(msg.sender, amount1));
-
     reserve0 = reserve0 - amount0;
     reserve1 = reserve1 - amount1;
   }
